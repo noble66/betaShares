@@ -1,9 +1,5 @@
-# prepares the html to show to feedback users. 
-def vertical_tbl(vData, previousFeedback, email='', was_submitted=False):
-    vLinks = vData['entries'].keys()
-    linksPrevious = ut.fpd_dl(previousFeedback)
-    #link = vLinks[0]
-    dataRes = '''<html>
+def html_template(email, was_submitted=False):
+    return '''<html>
     
     <head>
     
@@ -105,12 +101,22 @@ def vertical_tbl(vData, previousFeedback, email='', was_submitted=False):
     </style>
     <script>
       function downLoad(){
-        if (document.all){
-            document.all["layer1"].style.visibility="hidden";
-            document.all["layer2"].style.visibility="visible";
-        } else if (document.getElementById){
-            node = document.getElementById("layer1").style.visibility='hidden';
-            node = document.getElementById("layer2").style.visibility='visible';
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/<SUMAN FILL THIS EP>/" + email)
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) {
+                if (xhr.status == 200) {
+                    if (document.all){
+                        document.all["layer1"].style.visibility="hidden";
+                        document.all["layer2"].style.visibility="visible";
+                        document.all["layer2"].innerHTML = xhr.responseText;
+                    } else if (document.getElementById){
+                        document.getElementById("layer1").style.visibility='hidden';
+                        document.getElementById("layer2").style.visibility='visible';
+                        document.getElementById("layer2").innerHTML = xhr.responseText;
+                    }
+                }
+            }
         }
         
         was_submitted = document.getElementById('has_submitted').value;
@@ -139,9 +145,17 @@ def vertical_tbl(vData, previousFeedback, email='', was_submitted=False):
     </div>
     
     <div id="layer2" class="layer2_class">
-    
-  
+    </div>
+    </body>
+    </html>
     '''
+
+# prepares the html to show to feedback users. 
+def vertical_tbl(vData, previousFeedback, email='', was_submitted=False):
+    vLinks = vData['entries'].keys()
+    linksPrevious = ut.fpd_dl(previousFeedback)
+    dataRes = ''
+
     for link in vLinks:
         checkVal = ''
         if link in linksPrevious:
@@ -261,5 +275,4 @@ def vertical_tbl(vData, previousFeedback, email='', was_submitted=False):
     '''
     
     dataRes+=formControl
-    dataRes+='</div></body></html>'
     return dataRes
